@@ -15,17 +15,10 @@ app = FastAPI(
     version="2.0.0"
 )
 
-# CORS - tighten this in production!
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 # ==================== MongoDB Connection (LAZY + GRACEFUL) ====================
-MONGODB_URI = (
+# Get MongoDB URI from environment variable (set by ECS) or use fallback for local development
+MONGODB_URI = os.getenv(
+    "MONGODB_URI",
     "mongodb://ezinne:documentdb12@"
     "docdb-2025-11-19-16-33-00.cluster-clcgs4eoscam.eu-west-1.docdb.amazonaws.com:27017"
     "/shopokoa?"
@@ -34,6 +27,27 @@ MONGODB_URI = (
     "&retryWrites=false"
     "&directConnection=true"
     "&tlsAllowInvalidCertificates=true"   # Critical for DocumentDB
+)
+
+# CORS Configuration - allow origins from environment variable or default to all for development
+# For mobile apps, you may want to keep allow_origins=["*"] or specify your mobile app domains
+allowed_origins = os.getenv(
+    "CORS_ORIGINS",
+    "*"  # Default to allow all for development
+).split(",")
+
+# Remove empty strings and handle wildcard
+if "*" in allowed_origins:
+    cors_origins = ["*"]
+else:
+    cors_origins = [origin.strip() for origin in allowed_origins if origin.strip()]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 client: Optional[MongoClient] = None
