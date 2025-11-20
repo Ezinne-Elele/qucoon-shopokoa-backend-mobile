@@ -1,6 +1,6 @@
 # Shopokoa Backend Mobile API
 
-Flask-based REST API for the Shopokoa mobile application.
+FastAPI-based REST API for the Shopokoa mobile application.
 
 ## Features
 - Mobile-optimized product endpoints
@@ -25,10 +25,10 @@ Flask-based REST API for the Shopokoa mobile application.
 
 3. Run the application:
 ```bash
-   python app.py
+   uvicorn app:app --host 0.0.0.0 --port 5002 --reload
 ```
 
-The API will be available at `http://localhost:5001`
+The API will be available at `http://localhost:5002`
 
 ## API Endpoints
 
@@ -43,11 +43,11 @@ The API will be available at `http://localhost:5001`
 ## Docker Build
 ```bash
 docker build -t shopokoa-backend-mobile .
-docker run -p 5001:5001 -e MONGODB_URI="your-connection-string" shopokoa-backend-mobile
+docker run -p 5002:5002 -e MONGODB_URI="your-connection-string" shopokoa-backend-mobile
 ```
 
 ## Environment Variables
 
 - `MONGODB_URI` - MongoDB/DocumentDB connection string
 - `DB_NAME` - Database name (default: shopokoa)
-- `PORT` - Application port (default: 5001)
+- `PORT` - Application port (default: 5002)
