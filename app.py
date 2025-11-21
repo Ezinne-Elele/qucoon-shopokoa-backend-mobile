@@ -215,6 +215,9 @@ def get_dummy_products() -> List[Dict[str, Any]]:
 async def health_check():
     return {"status": "healthy", "service": "mobile-api", "timestamp": datetime.utcnow().isoformat()}
 
+@app.get("/api/mobile/health", tags=["Health"])
+async def health_check():
+    return {"status": "healthy", "service": "mobile-api", "timestamp": datetime.utcnow().isoformat()}
 
 # ------------------- Products -------------------
 @app.get("/api/mobile/products", response_model=List[ProductInDB], tags=["Products"])
