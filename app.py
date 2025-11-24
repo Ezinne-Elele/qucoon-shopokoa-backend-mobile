@@ -215,12 +215,12 @@ def get_dummy_products() -> List[Dict[str, Any]]:
 async def health_check():
     return {"status": "healthy", "service": "mobile-api", "timestamp": datetime.utcnow().isoformat()}
 
-@app.get("/api/mobile/health", tags=["Health"])
+@app.get("/mobile/health", tags=["Health"])
 async def health_check():
     return {"status": "healthy", "service": "mobile-api", "timestamp": datetime.utcnow().isoformat()}
 
 # ------------------- Products -------------------
-@app.get("/api/mobile/products", response_model=List[ProductInDB], tags=["Products"])
+@app.get("/mobile/products", response_model=List[ProductInDB], tags=["Products"])
 async def get_products(category: Optional[str] = Query(None)):
     query = {"category": category} if category else {}
     try:
@@ -241,7 +241,7 @@ async def get_products(category: Optional[str] = Query(None)):
     return products
 
 
-@app.get("/api/mobile/products/{product_id}", tags=["Products"])
+@app.get("/mobile/products/{product_id}", tags=["Products"])
 async def get_product(product_id: str):
     try:
         product = products_collection.find_one({"id": product_id}, {"_id": 0})
@@ -261,7 +261,7 @@ async def get_product(product_id: str):
     return product
 
 
-@app.post("/api/mobile/products", status_code=status.HTTP_201_CREATED, response_model=ProductInDB, tags=["Products"])
+@app.post("/mobile/products", status_code=status.HTTP_201_CREATED, response_model=ProductInDB, tags=["Products"])
 async def create_product(product: ProductCreate):
     if not products_collection:
         raise HTTPException(status_code=503, detail="Database not available")
@@ -282,7 +282,7 @@ async def create_product(product: ProductCreate):
     return new_product
 
 
-@app.put("/api/mobile/products/{product_id}", response_model=ProductInDB, tags=["Products"])
+@app.put("/mobile/products/{product_id}", response_model=ProductInDB, tags=["Products"])
 async def update_product(product_id: str, product_update: ProductUpdate):
     update_data = product_update.dict(exclude_unset=True)
     if "updatedAt" not in update_data:
@@ -311,7 +311,7 @@ async def update_product(product_id: str, product_update: ProductUpdate):
     return updated_product
 
 
-@app.delete("/api/mobile/products/{product_id}", tags=["Products"])
+@app.delete("/mobile/products/{product_id}", tags=["Products"])
 async def delete_product(product_id: str):
     result = products_collection.delete_one({"id": product_id})
     if result.deleted_count == 0:
@@ -321,7 +321,7 @@ async def delete_product(product_id: str):
 
 # ============= ORDERS ENDPOINTS =============
 
-@app.post("/api/mobile/orders", status_code=status.HTTP_201_CREATED, response_model=OrderInDB, tags=["Orders"])
+@app.post("/mobile/orders", status_code=status.HTTP_201_CREATED, response_model=OrderInDB, tags=["Orders"])
 async def create_order(order: OrderCreate):
     # Validate stock
     for item in order.items:
@@ -370,7 +370,7 @@ async def create_order(order: OrderCreate):
     return new_order
 
 
-@app.get("/api/mobile/orders", response_model=List[OrderInDB], tags=["Orders"])
+@app.get("/mobile/orders", response_model=List[OrderInDB], tags=["Orders"])
 async def get_orders(limit: int = Query(10, le=100), status_filter: Optional[str] = Query(None, alias="status")):
     query = {"status": status_filter} if status_filter else {}
     orders = list(
@@ -387,7 +387,7 @@ async def get_orders(limit: int = Query(10, le=100), status_filter: Optional[str
     return orders
 
 
-@app.get("/api/mobile/orders/{order_id}", response_model=OrderInDB, tags=["Orders"])
+@app.get("/mobile/orders/{order_id}", response_model=OrderInDB, tags=["Orders"])
 async def get_order(order_id: str):
     order = orders_collection.find_one({"orderId": order_id}, {"_id": 0})
     if not order:
@@ -400,7 +400,7 @@ async def get_order(order_id: str):
     return order
 
 
-@app.patch("/api/mobile/orders/{order_id}/status", response_model=OrderInDB, tags=["Orders"])
+@app.patch("/mobile/orders/{order_id}/status", response_model=OrderInDB, tags=["Orders"])
 async def update_order_status(order_id: str, payload: OrderStatusUpdate):
     result = orders_collection.update_one(
         {"orderId": order_id},
@@ -424,7 +424,7 @@ async def update_order_status(order_id: str, payload: OrderStatusUpdate):
     return updated_order
 
 
-@app.get("/api/mobile/orders/stats", tags=["Orders"])
+@app.get("/mobile/orders/stats", tags=["Orders"])
 async def get_order_stats():
     pipeline = [
         {
